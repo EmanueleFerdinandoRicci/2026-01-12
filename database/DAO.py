@@ -38,7 +38,14 @@ class DAO():
         cursor.execute(query, (y1,y2,))
 
         for row in cursor:
-            results.append(Constructor(**row))
+            costruttore = Constructor(
+                row["constructorId"],
+                row["constructorRef"],
+                row["name"],
+                row["nationality"],
+                0
+            )
+            results.append(costruttore)
 
         cursor.close()
         conn.close()
@@ -66,6 +73,27 @@ class DAO():
 
         for row in cursor:
             results.append(Arco(idMapD[row["id1"]], idMapD[row["id2"]]))
+
+        cursor.close()
+        conn.close()
+        return results
+
+    @staticmethod
+    def getVeterani(year1, year2, idMapD):
+        conn = DBConnect.get_connection()
+
+        results = []
+
+        cursor = conn.cursor(dictionary=True)
+        query = """SELECT r.constructorId as id, MIN(d.dob) as oldest_dob
+                    FROM results r, races ra, drivers d
+                    WHERE r.raceId = ra.raceId and r.driverId = d.driverId and ra.year >= %s AND ra.year <= %s AND r.position != 0
+                    GROUP BY r.constructorId"""
+
+        cursor.execute(query, (year1, year2, ))
+
+        for row in cursor:
+            results.append((idMapD[row["id"]], row["oldest_dob"]))
 
         cursor.close()
         conn.close()
