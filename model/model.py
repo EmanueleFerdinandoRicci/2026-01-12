@@ -28,6 +28,7 @@ class Model:
         self._graph.add_nodes_from(self._constructors)
 
         allEdges = DAO.getAllEdges(y1, y2, self._idMapD)
+
         for e in allEdges:
             if self._graph.has_edge(e.constructor1, e.constructor2):
                 peso = self._graph.get_edge_data(e.constructor1, e.constructor2, "weight")
